@@ -1,6 +1,6 @@
 # TaskSchedulizer
 
-TaskSchedulizer is an efficient task scheduler written in Go. It allows clients to submit tasks along with their scheduled times, handling the scheduling process seamlessly. This project leverages MySQL for data storage and Docker for containerization.
+TaskSchedulizer is an efficient task scheduling API written in Go. It allows clients to submit tasks along with their scheduled times, handling the scheduling process seamlessly. This project leverages MySQL for data storage and Docker for containerization.
 
 ## Features
 
