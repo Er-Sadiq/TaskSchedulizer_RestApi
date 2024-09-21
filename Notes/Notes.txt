@@ -1,0 +1,26 @@
+
+what is this ?
+this is a simple task schedular that effectively manages and distrubutes task among works 
+
+here is how it is going to work:
+
+# schedular
+1) recivers task and time in the form of string from the client 
+
+2) stores it in db 
+
+
+#Coordinator
+3) selects and distrubutes these tasks among the workers based on their schedules
+
+4) manages worker registration and check their status
+
+
+# worker
+5) perform the task provided by Coordinator and report back status
+
+6) registrates and send a heartbeat signal 
+
+#mysql and docker file to wrap this project
+
+curl -X POST http://localhost:8081/taskschedulizer -d '{"task":"Do laundry", "time":"2024-09-21T14:00:00Z"}' -H "Content-Type: application/json"
