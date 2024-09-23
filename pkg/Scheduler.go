@@ -1,14 +1,20 @@
 package pkg
 
 import (
+	"database/sql"
 	"encoding/json"
+	"fmt"
 	"net/http"
+
+	_ "github.com/go-sql-driver/mysql"
 )
 
 type Task struct {
 	Task string `json:"task"`
 	Time string `json:"time"`
 }
+
+var db *sql.DB
 
 // SchedulerHandler handles the /taskschedulizer endpoint
 func SchedulerHandler(w http.ResponseWriter, r *http.Request) {
@@ -25,7 +31,11 @@ func SchedulerHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	//printTask(task)
+	// Insert the task into the database
+	if err := InsertResponseIntoDB(task.Task, task.Time); err != nil {
+		http.Error(w, "Error inserting into database: "+err.Error(), http.StatusInternalServerError)
+		return
+	}
 
 	// Sample response to send back to the client
 	response := map[string]string{
@@ -39,8 +49,35 @@ func SchedulerHandler(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(response)
 }
 
-// // printTask prints the details of a given task
-// func printTask(t Task) {
-// 	fmt.Println("Task:", t.Task)
-// 	fmt.Println("Scheduled Time:", t.Time)
-// }
+// SetUpDataBase initializes the database connection (to be reused)
+func SetUpDataBase() error {
+	var err error
+	// Only set up the connection if it hasn't been set up yet
+	if db == nil {
+		db, err = sql.Open("mysql", "root:mysql#888@tcp(127.0.0.1:3306)/SchedulerSchema")
+		if err != nil {
+			return err
+		}
+		// Check if the connection
+		if err := db.Ping(); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+// InsertResponseIntoDB inserts the task and time into the database
+func InsertResponseIntoDB(task string, time string) error {
+	if err := SetUpDataBase(); err != nil {
+		return fmt.Errorf("error setting up database: %w", err)
+	}
+
+	query := "INSERT INTO TaskTable(task, time) VALUES(?, ?)"
+	_, err := db.Exec(query, task, time)
+	if err != nil {
+		return err
+	}
+
+	fmt.Println("Task scheduled successfully!")
+	return nil
+}
